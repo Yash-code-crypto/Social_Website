@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block nav_btn1 %}
+<button type="button" class="btn btn-outline-primary ml-4" data-toggle="modal" data-target="#PostModal">
+    Post
+</button>
+
+{% endblock nav_btn1 %}
+
+{% block css %}
+
+    #post_img{
+    width:460;
+    heigt:360;
+    border:2px solid red;
+    }
+
+    .post_div{
+    width:535px;
+    background-color:green;
+    }
+    .post_back{
+    background-color:#848a34;
+    }
+    .post_bac{
+    background-color:black;
+    }
+
+
+{% endblock css %}
+
+
+{% block body %}
+
+<div id="stories" class="storiesWrapper post_back">
+
+{% for i in posts %}
+<div class='container my-4 post_div' id="{{ i.id }}">
+  <div class="card post_bac">
+    <h5 class="card-header">
+      <a href="{% url 'userpage:user_profile' i.user %}" style="color:red;">{{i.user}}</a>
+      <small style="color:#42f5e9;">{{i.date.date}}</small>
+    </h5>
+    <div class="card-body">
+      <p class="card-text" style="color:yellow;">Caption: {{i.caption}}</p>
+      {% if i.image %}
+        <img src="{{i.image.url}}" alt="Image" id='post_img'>
+      {% endif %}
+      <hr size='30px'>
+
+      <button class="btn btn-light mr-3 like" id="{{ i.id }}">
+        {% if i in liked_post %}
+            <a href="{% url 'userpage:like_dislike_post' %}" style="color:red;" id="likebtn{{ i.id }}"> Liked </a>
+        {% else %}
+            <a href="{% url 'userpage:like_dislike_post' %}" style="color:red;" id="likebtn{{ i.id }}"> Like </a>
+        {% endif %}
+      </button>
+
+
+
+      {% if request.user == i.user %}
+      <a class="btn btn-danger ml-4 delete" href="{% url 'userpage:delpost' i.id %}" id="{{ i.id }}">Delete</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endfor %}
+</div>
+
+{% endblock body %}
+
+{% block modals %}
+
+<!-- Modal -->
+<div class="modal fade"  id="PostModal" tabindex="-1" role="dialog" aria-labelledby="PostModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="PostModalLabel">Show Time</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" style="background-color:#4e5157">
+        <form action="/userpage/post" method="POST"  enctype="multipart/form-data">
+          {% csrf_token %}
+          <label for="image" style="color:black">Image : </label>
+          <input type="file" name="image" id="image">
+          <br><br><br>
+          <label for="captions" style="color:black">Captions : </label>
+          <br>
+          <textarea name="captions" id="captions" cols="45" rows="10" placeholder="Oohlala..." class='ml-4'></textarea>
+          <hr size='30'>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Let's Show</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+{% endblock modals %}
+
+{% block js %}
+
+<script src="{% static 'userpage/js/delete.js' %}"></script>
+<script src="{% static 'userpage/js/like.js' %}"></script>
+
+{% endblock js %}
